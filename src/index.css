@@ -534,6 +534,107 @@ body {
 		}
 	}
 
+	#veronica {
+		@apply dark:bg-dark-700 absolute top-32 left-1/12 w-xl rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
+
+		h2 {
+			@apply w-full text-center text-sm font-bold;
+		}
+
+		.terminal-body {
+			@apply font-roboto p-5 text-sm text-black dark:text-white;
+			max-height: calc(82vh - 52px);
+			overflow-y: auto;
+			overscroll-behavior: contain;
+			scrollbar-width: thin;
+		}
+
+		.terminal-line {
+			@apply leading-relaxed whitespace-pre-wrap break-words;
+			min-height: 1.375rem;
+		}
+
+		.terminal-input-line {
+			@apply mt-2 flex items-center gap-2;
+		}
+
+		.terminal-prompt {
+			@apply shrink-0 font-bold text-[#00A154];
+		}
+
+		.terminal-input {
+			@apply w-full bg-transparent font-roboto text-sm text-black caret-[#00A154] outline-none dark:text-white;
+		}
+
+		.terminal-system {
+			@apply text-gray-400 dark:text-gray-500;
+		}
+
+		.terminal-error {
+			@apply text-red-500;
+		}
+
+		.terminal-loading {
+			@apply text-gray-400 dark:text-gray-500;
+		}
+
+		.terminal-suggestion {
+			@apply text-yellow-500;
+		}
+
+		.terminal-link {
+			@apply text-blue-500 underline;
+		}
+	}
+
+	#mobile-veronica {
+		@apply dark:bg-dark-700 absolute top-[var(--mobile-navbar-height)] z-[var(--z-mobile-window)] h-[calc(100dvh-var(--mobile-navbar-height))] w-screen overflow-y-auto bg-white transition-colors duration-300 select-none sm:hidden;
+
+		.terminal-body {
+			@apply font-roboto p-5 text-sm text-black dark:text-white;
+			overflow-y: auto;
+			overscroll-behavior: contain;
+			scrollbar-width: thin;
+		}
+
+		.terminal-line {
+			@apply leading-relaxed whitespace-pre-wrap break-words;
+			min-height: 1.375rem;
+		}
+
+		.terminal-input-line {
+			@apply mt-2 flex items-center gap-2;
+		}
+
+		.terminal-prompt {
+			@apply shrink-0 font-bold text-[#00A154];
+		}
+
+		.terminal-input {
+			@apply w-full bg-transparent font-roboto text-sm text-black caret-[#00A154] outline-none dark:text-white;
+		}
+
+		.terminal-system {
+			@apply text-gray-400 dark:text-gray-500;
+		}
+
+		.terminal-error {
+			@apply text-red-500;
+		}
+
+		.terminal-loading {
+			@apply text-gray-400 dark:text-gray-500;
+		}
+
+		.terminal-suggestion {
+			@apply text-yellow-500;
+		}
+
+		.terminal-link {
+			@apply text-blue-500 underline;
+		}
+	}
+
 	#contact {
 		@apply dark:bg-dark-700 absolute top-60 left-5/12 max-w-2xl rounded-xl bg-white text-black shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden dark:text-white;
 

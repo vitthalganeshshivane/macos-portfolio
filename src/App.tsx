@@ -28,6 +28,8 @@ const Resume = lazy(() => import('#windows/Resume'));
 const Safari = lazy(() => import('#windows/Safari'));
 const Terminal = lazy(() => import('#windows/Terminal'));
 const Text = lazy(() => import('#windows/Text'));
+const Veronica = lazy(() => import('#windows/Veronica'));
+const MobileVeronica = lazy(() => import('#windows/mobile/Veronica'));
 
 interface OpenWindows {
 	resume: boolean;
@@ -38,6 +40,7 @@ interface OpenWindows {
 	photos: boolean;
 	contact: boolean;
 	terminal: boolean;
+	veronica: boolean;
 }
 
 /**
@@ -55,6 +58,7 @@ const App = (): ReactElement => {
 				photos: state.windows.photos.isOpen,
 				contact: state.windows.contact.isOpen,
 				terminal: state.windows.terminal.isOpen,
+				veronica: state.windows.veronica.isOpen,
 			}),
 		),
 	);
@@ -115,6 +119,12 @@ const App = (): ReactElement => {
 			{openWindows.terminal ? (
 				<Suspense fallback={null}>
 					{isMobile ? <MobileTerminal /> : <Terminal />}
+				</Suspense>
+			) : null}
+
+			{openWindows.veronica ? (
+				<Suspense fallback={null}>
+					{isMobile ? <MobileVeronica /> : <Veronica />}
 				</Suspense>
 			) : null}
 		</main>
