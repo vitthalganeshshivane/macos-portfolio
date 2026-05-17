@@ -103,6 +103,13 @@ const dockApps = [
     showOnMobile: false,
   },
   {
+    id: "veronica",
+    name: "Veronica",
+    icon: "terminal.png",
+    canOpen: true,
+    showOnMobile: false,
+  },
+  {
     id: "trash",
     name: "Archive", // was "Trash"
     icon: "trash.png",
@@ -357,6 +364,47 @@ const CONTACT_AVATAR_URL = "/images/Black&white.jpeg";
 /** Primary email shown in the Contact window. */
 const CONTACT_EMAIL = "vitthalganeshshivane@gmail.com";
 
+/**
+ * Project metadata for terminal commands.
+ */
+const projects = [
+  {
+    name: "DocSpace",
+    description:
+      "Collaborative document editor inspired by Google Docs. Rich-text editing with TipTap, tables, task lists, comments.",
+    tags: ["React", "TipTap", "Node.js", "MongoDB"],
+    href: "https://github.com/vitthalganeshshivane/DocSpace-Collaborative-Document-Editor",
+  },
+  {
+    name: "Writeflow",
+    description:
+      "Distraction-free writing and blogging platform. Clean editor experience, minimal productivity-oriented UI.",
+    tags: ["React", "Node.js", "Express", "MongoDB"],
+    href: "https://github.com/vitthalganeshshivane/Writeflow-Client",
+  },
+  {
+    name: "MindGuard",
+    description:
+      "AI-powered mental health detection system. ML risk prediction with LLM-powered empathetic assessments.",
+    tags: ["React", "Python", "Machine Learning", "LLM"],
+    href: "https://github.com/vitthalganeshshivane/mental-health-frontend",
+  },
+  {
+    name: "Vroom45",
+    description:
+      "Full-stack ride booking app. Real-time location tracking, fare calculation, driver-passenger interaction.",
+    tags: ["React", "Node.js", "Express", "MongoDB"],
+    href: "https://github.com/vitthalganeshshivane/Ubar_Clone-frontend",
+  },
+  {
+    name: "Digital Classroom",
+    description:
+      "Web-based classroom management system. Assignments, live class links, notice board, study material.",
+    tags: ["React", "Node.js", "Express", "MongoDB"],
+    href: "https://github.com/vitthalganeshshivane/digital-classroom-frontend",
+  },
+];
+
 export {
   blogPosts,
   CONTACT_AVATAR_URL,
@@ -365,6 +413,7 @@ export {
   gallery,
   navIcons,
   navLinks,
+  projects,
   safariBookmarks,
   socials,
   techStack,
@@ -973,6 +1022,7 @@ const WINDOW_CONFIG: WindowConfig = {
   safari: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
   photos: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
   terminal: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
+  veronica: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
   txtfile: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
   imgfile: { isOpen: false, zIndex: INITIAL_Z_INDEX, data: null },
 };
