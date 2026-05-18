@@ -33,6 +33,69 @@ body {
 	transition-timing-function: ease;
 }
 
+/* ==========================================================================
+   macOS Native Scrollbar System
+   Thin, floating, rounded, semi-transparent with hover expansion.
+   Matches macOS Sonoma/Sequoia scrollbar aesthetics.
+   ========================================================================== */
+
+/* Chromium (Chrome, Edge, Safari, Opera) */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+	border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(0, 0, 0, 0.18);
+	border-radius: 9999px;
+	transition: background 0.2s ease, width 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(0, 0, 0, 0.35);
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+/* Horizontal scrollbar */
+::-webkit-scrollbar-horizontal {
+	height: 8px;
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+/* Dark mode - light thumb on dark backgrounds */
+:is(.dark, .dark *)::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.18);
+}
+
+:is(.dark, .dark *)::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+:is(.dark, .dark *)::-webkit-scrollbar-thumb:active {
+	background: rgba(255, 255, 255, 0.45);
+}
+
+/* Firefox support */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+
+:is(.dark, .dark *) {
+	scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
 @theme {
 	--font-georama: 'Georama', sans-serif;
 	--font-roboto: 'Roboto Mono', monospace;
@@ -187,7 +250,7 @@ body {
 	}
 
 	.desktop-window {
-		@apply max-h-[82vh] overflow-x-hidden overflow-y-auto;
+		@apply overflow-x-hidden overflow-y-auto;
 	}
 
 	.desktop-window > .window-header {
@@ -203,7 +266,7 @@ body {
 	}
 
 	#safari {
-		@apply dark:bg-dark-700 top-40 left-2/12 flex h-[78vh] w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 select-none max-sm:hidden sm:absolute;
+		@apply dark:bg-dark-700 top-40 left-2/12 flex w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 select-none max-sm:hidden sm:absolute;
 
 		.safari-header {
 			@apply grid grid-cols-[1fr_minmax(22rem,30rem)_1fr] items-center gap-4;
@@ -449,7 +512,7 @@ body {
 	}
 
 	#terminal {
-		@apply dark:bg-dark-700 absolute top-32 left-1/12 w-xl rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
+		@apply dark:bg-dark-700 absolute top-32 left-1/12 w-xl flex flex-col rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
 
 		h2 {
 			@apply w-full text-center text-sm font-bold;
@@ -546,7 +609,6 @@ body {
 			max-height: calc(82vh - 52px);
 			overflow-y: auto;
 			overscroll-behavior: contain;
-			scrollbar-width: thin;
 		}
 
 		.terminal-line {
@@ -594,7 +656,6 @@ body {
 			@apply font-roboto p-5 text-sm text-black dark:text-white;
 			overflow-y: auto;
 			overscroll-behavior: contain;
-			scrollbar-width: thin;
 		}
 
 		.terminal-line {
@@ -696,7 +757,7 @@ body {
 	}
 
 	#photos {
-		@apply dark:bg-dark-700 absolute top-96 left-1/2 flex h-[78vh] w-[min(80vw,56rem)] max-w-[90vw] -translate-y-1/2 flex-col overflow-hidden rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
+		@apply dark:bg-dark-700 absolute top-96 left-1/2 flex w-[min(80vw,56rem)] max-w-[90vw] -translate-y-1/2 flex-col overflow-hidden rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
 
 		&.desktop-window {
 			@apply overflow-hidden;
@@ -802,15 +863,7 @@ body {
 	}
 
 	#resume {
-		@apply dark:bg-dark-700 absolute top-16 left-7/12 flex h-[78vh] w-[min(72vw,56rem)] max-w-[80vw] flex-col overflow-x-hidden overflow-y-auto rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
-
-		scrollbar-width: none;
-
-		-ms-overflow-style: none;
-
-		&::-webkit-scrollbar {
-			display: none;
-		}
+		@apply dark:bg-dark-700 absolute top-16 left-7/12 flex w-[min(72vw,56rem)] max-w-[80vw] flex-col overflow-x-hidden overflow-y-auto rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
 
 		.window-header {
 			@apply sticky top-0 z-20;
@@ -838,7 +891,7 @@ body {
 	}
 
 	#finder {
-		@apply absolute top-20 left-40 flex h-[78vh] w-3xl flex-col overflow-hidden rounded-xl shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
+		@apply absolute top-20 left-40 flex w-3xl flex-col overflow-hidden rounded-xl shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
 
 		.sidebar {
 			@apply dark:bg-dark-300 dark:border-dark-500 flex h-full w-48 shrink-0 flex-col space-y-3 overflow-y-auto border-r border-gray-200 bg-gray-50 p-5;
@@ -974,7 +1027,7 @@ body {
 	}
 
 	#imgfile {
-		@apply dark:bg-dark-700 absolute top-20 left-1/2 flex h-[78vh] w-[min(86vw,72rem)] max-w-[92vw] -translate-x-1/2 flex-col overflow-hidden rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
+		@apply dark:bg-dark-700 absolute top-20 left-1/2 flex w-[min(86vw,72rem)] max-w-[92vw] -translate-x-1/2 flex-col overflow-hidden rounded-xl bg-white shadow-2xl drop-shadow-2xl transition-colors duration-300 max-sm:hidden;
 
 		.window-header {
 			h2 {
