@@ -26,7 +26,10 @@ export class NvidiaNimProvider implements AIProvider {
 	constructor(config: NvidiaNimConfig) {
 		this.apiKey = config.apiKey;
 		this.model = config.model ?? DEFAULT_MODEL;
-		this.baseUrl = config.baseUrl ?? NVIDIA_NIM_API_URL;
+		this.baseUrl =
+			config.baseUrl ??
+			(import.meta.env.VITE_NVIDIA_NIM_PROXY_URL as string | undefined) ??
+			NVIDIA_NIM_API_URL;
 	}
 
 	async complete(request: AIRequest): Promise<AIResponse> {
