@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react';
 import type { TerminalLine } from '../types';
 import { SegmentRenderer } from './SegmentRenderer';
-import { PROMPT } from '../constants';
 
 interface LineRendererProps {
 	line: TerminalLine;
