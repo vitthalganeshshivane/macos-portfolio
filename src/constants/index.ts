@@ -111,7 +111,7 @@ const dockApps = [
   },
   {
     id: "trash",
-    name: "Archive", // was "Trash"
+    name: "Bin", // was "Trash"
     icon: "trash.png",
     canOpen: false,
     showOnMobile: false,
@@ -273,7 +273,7 @@ const socials = [
     text: "Website",
     icon: "/icons/atom.svg",
     bg: "#4bcb63",
-    link: "https://vitthalganeshshivane.github.io/portfolio",
+    link: "https://vitthalganeshshivane.vercel.app",
   },
   {
     id: 3,
@@ -359,7 +359,7 @@ const gallery = GALLERY_IMAGES.map((img, index) => ({
 })) satisfies GalleryItem[];
 
 /** Avatar URL shown in the Contact window. */
-const CONTACT_AVATAR_URL = "/images/Black&white.jpeg";
+const CONTACT_AVATAR_URL = "/images/Aboutpic.png";
 
 /** Primary email shown in the Contact window. */
 const CONTACT_EMAIL = "vitthalganeshshivane@gmail.com";
@@ -515,7 +515,7 @@ const WORK_LOCATION = {
           kind: "file",
           fileType: "url",
           href: "https://github.com/vitthalganeshshivane/Writeflow-Client",
-          position: "top-20 left-20",
+          position: "top-10 left-10",
         },
         {
           id: 3,
@@ -595,7 +595,7 @@ const WORK_LOCATION = {
           icon: "/images/image.png",
           kind: "file",
           fileType: "img",
-          position: "top-52 right-80",
+          position: "top-52 right-50",
           imageUrl:
             "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?q=80&w=2000&auto=format&fit=crop",
         },
@@ -641,7 +641,7 @@ const WORK_LOCATION = {
           kind: "file",
           fileType: "url",
           href: "https://github.com/vitthalganeshshivane/Ubar_Clone-frontend",
-          position: "top-10 right-20",
+          position: "top-10 right-10",
         },
         {
           id: 3,
@@ -658,7 +658,7 @@ const WORK_LOCATION = {
           icon: "/images/image.png",
           kind: "file",
           fileType: "img",
-          position: "top-52 right-80",
+          position: "top-52 right-50",
           imageUrl:
             "https://media.licdn.com/dms/image/v2/D5612AQGEj1_pOIxVIA/article-cover_image-shrink_600_2000/article-cover_image-shrink_600_2000/0/1706172015188?e=2147483647&v=beta&t=tByxAL12GywZbzKlapnj_g6uE0KFEV04HNxkHPPT_1A",
         },
@@ -721,7 +721,7 @@ const WORK_LOCATION = {
           icon: "/images/image.png",
           kind: "file",
           fileType: "img",
-          position: "top-52 right-80",
+          position: "top-52 right-40",
           imageUrl:
             "https://www.bthaber.com/wp-content/uploads/2020/06/GessTurkiye_UzaktanE%C4%9Fitim_Gorsel02-1024x1024.jpg",
         },
