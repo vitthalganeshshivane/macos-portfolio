@@ -4,6 +4,10 @@ const NVIDIA_NIM_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions
 const DEFAULT_MODEL = 'google/gemma-3n-e4b-it';
 const REQUEST_TIMEOUT_MS = 30_000;
 
+const IS_PROD = import.meta.env.PROD;
+const PROXY_URL =
+	(import.meta.env.VITE_NVIDIA_NIM_PROXY_URL as string | undefined) ?? '/api/nvidia';
+
 interface NvidiaNimConfig {
 	apiKey: string;
 	model?: string;
@@ -27,9 +31,7 @@ export class NvidiaNimProvider implements AIProvider {
 		this.apiKey = config.apiKey;
 		this.model = config.model ?? DEFAULT_MODEL;
 		this.baseUrl =
-			config.baseUrl ??
-			(import.meta.env.VITE_NVIDIA_NIM_PROXY_URL as string | undefined) ??
-			NVIDIA_NIM_API_URL;
+			config.baseUrl ?? (IS_PROD ? PROXY_URL : NVIDIA_NIM_API_URL);
 	}
 
 	async complete(request: AIRequest): Promise<AIResponse> {
@@ -43,20 +45,40 @@ export class NvidiaNimProvider implements AIProvider {
 		const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
 		try {
-			const response = await fetch(this.baseUrl, {
+			const isProxy = this.baseUrl.startsWith('/api') || this.baseUrl.includes('/api/nvidia');
+
+			const fetchOptions: RequestInit = {
 				method: 'POST',
 				headers: {
-					Authorization: `Bearer ${this.apiKey}`,
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({
-					model: this.model,
-					messages,
-					max_tokens: 512,
-					temperature: 0.7,
-				}),
+				body: JSON.stringify(
+					isProxy
+						? {
+								apiKey: this.apiKey,
+								model: this.model,
+								messages,
+								max_tokens: 512,
+								temperature: 0.7,
+							}
+						: {
+								model: this.model,
+								messages,
+								max_tokens: 512,
+								temperature: 0.7,
+							},
+				),
 				signal: controller.signal,
-			});
+			};
+
+			if (!isProxy) {
+				fetchOptions.headers = {
+					...fetchOptions.headers,
+					Authorization: `Bearer ${this.apiKey}`,
+				};
+			}
+
+			const response = await fetch(this.baseUrl, fetchOptions);
 
 			if (!response.ok) {
 				const errorText = await response.text().catch(() => 'Unknown error');
