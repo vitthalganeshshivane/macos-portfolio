@@ -17,3 +17,5 @@ export { default as Resume } from './Resume';
 export { default as Safari } from './Safari';
 export { default as Terminal } from './Terminal';
 export { default as Text } from './Text';
+export { default as Veronica } from './Veronica';
+export { default as MobileVeronica } from './mobile/Veronica';

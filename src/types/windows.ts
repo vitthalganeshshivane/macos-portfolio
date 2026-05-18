@@ -10,6 +10,7 @@ export type WindowKey =
 	| 'safari'
 	| 'photos'
 	| 'terminal'
+	| 'veronica'
 	| 'txtfile'
 	| 'imgfile';
 

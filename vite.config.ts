@@ -45,6 +45,10 @@ const aliases: Alias[] = [
 		find: '#types',
 		replacement: resolve(rootDir, 'src/types'),
 	},
+	{
+		find: '#veronica',
+		replacement: resolve(rootDir, 'src/veronica'),
+	},
 ];
 
 // https://vite.dev/config/
