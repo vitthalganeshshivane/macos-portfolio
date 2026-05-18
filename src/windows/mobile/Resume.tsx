@@ -41,7 +41,7 @@ const MobileResume = (): ReactElement => {
 					) : (
 						<Document
 							className="resume-pdf"
-							file={`/files/resume.pdf?retry=${String(resumeRetryCount)}`}
+							file={`/files/Vitthal_Ganesh_Shivane_Resume.pdf?retry=${String(resumeRetryCount)}`}
 							loading={<p>Loading resume…</p>}
 							onLoadSuccess={({ numPages }) => {
 								setResumeLoadError(null);

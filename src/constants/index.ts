@@ -107,7 +107,7 @@ const dockApps = [
     name: "Veronica",
     icon: "terminal.png",
     canOpen: true,
-    showOnMobile: false,
+    showOnMobile: true,
   },
   {
     id: "trash",
