@@ -1,6 +1,7 @@
 import type { WindowKey } from '#store';
 import { useWindowStore } from '#store';
 import type { ReactElement } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 interface WindowControlsProps {
 	target: WindowKey;
@@ -9,7 +10,11 @@ interface WindowControlsProps {
 export const WindowControls = ({
 	target,
 }: WindowControlsProps): ReactElement => {
-	const { closeWindow } = useWindowStore();
+	const { closeWindow, toggleMaximize } = useWindowStore();
+	const isMaximized = useWindowStore(
+		useShallow((state) => state.windows[target]?.isMaximized ?? false),
+	);
+
 	return (
 		<div className="window-controls">
 			<button
@@ -23,19 +28,18 @@ export const WindowControls = ({
 			<button
 				type="button"
 				className="minimize"
-				aria-label="Minimize window"
-				aria-disabled="true"
-				disabled
-				// TODO: Wire minimize behavior.
+				aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
+				onClick={() => {
+					toggleMaximize(target);
+				}}
 			/>
 			<button
 				type="button"
 				className="maximize"
-				aria-label="Maximize window"
-				aria-disabled="true"
-				disabled
-				// TODO: Wire maximize behavior.
+				aria-label="Zoom window"
 			/>
 		</div>
 	);
 };
+
+export default WindowControls;

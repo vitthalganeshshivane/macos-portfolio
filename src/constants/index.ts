@@ -105,7 +105,7 @@ const dockApps = [
   {
     id: "veronica",
     name: "Veronica",
-    icon: "terminal.png",
+    icon: "veyronica.png",
     canOpen: true,
     showOnMobile: true,
   },
