@@ -221,7 +221,7 @@ body {
 		}
 
 		.dock-icon {
-			@apply 3xl:size-20 size-14 cursor-pointer max-sm:size-full;
+			@apply 3xl:size-20 size-14 cursor-pointer max-sm:size-14;
 
 			img {
 				@apply object-cover object-center;
