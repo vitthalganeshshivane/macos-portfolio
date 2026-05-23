@@ -1139,4 +1139,12 @@ body {
 			@apply h-full flex-1;
 		}
 	}
+
+	.boot-screen {
+		@apply fixed inset-0 z-[99999] flex items-center justify-center bg-black;
+	}
+
+	.boot-logo {
+		@apply max-w-20 max-h-20 w-auto h-auto object-contain;
+	}
 }

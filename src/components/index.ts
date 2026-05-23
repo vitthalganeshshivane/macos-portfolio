@@ -1,4 +1,5 @@
 // Barrel exports for shared components.
+export * from './BootScreen';
 export * from './Dock';
 export * from './Home';
 export * from './mobile/Home';

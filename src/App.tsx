@@ -1,6 +1,7 @@
-import { lazy, Suspense, type ReactElement } from 'react';
+import { lazy, Suspense, useState, type ReactElement } from 'react';
 
 import {
+	BootScreen,
 	Dock,
 	Home,
 	MobileHome,
@@ -47,6 +48,8 @@ interface OpenWindows {
  * Root layout for the macOS-style portfolio.
  */
 const App = (): ReactElement => {
+	const [bootComplete, setBootComplete] = useState(false);
+
 	const openWindows = useWindowStore(
 		useShallow(
 			(state): OpenWindows => ({
@@ -63,6 +66,10 @@ const App = (): ReactElement => {
 		),
 	);
 	const isMobile = useIsMobile();
+
+	if (!bootComplete) {
+		return <BootScreen onComplete={() => { setBootComplete(true); }} />;
+	}
 
 	return (
 		<main>
