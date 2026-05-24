@@ -3,18 +3,17 @@ import { useWindowStore, type WindowState } from '#store';
 import type { WindowKey } from '#types';
 import {
 	calculateResize,
-	calculateDrag,
 	applyResizeToElement,
-	applyDragToElement,
 	getDirectionFromPosition,
 	getCursorForDirection,
+	DESKTOP_NAVBAR_HEIGHT,
 	type ResizeDirection,
 	type ResizeState,
 } from '#lib/resize-engine';
 import { ResizeHandle } from '#components/ResizeHandle';
 import { useGSAP } from '@gsap/react';
 import type { ComponentType, ReactElement, JSX as ReactJSX } from 'react';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 
 const WINDOW_MIN_SIZE: Record<string, { minWidth: number; minHeight: number }> = {
 	finder: { minWidth: 400, minHeight: 300 },
@@ -26,6 +25,13 @@ const WINDOW_MIN_SIZE: Record<string, { minWidth: number; minHeight: number }> =
 	veronica: { minWidth: 350, minHeight: 400 },
 	txtfile: { minWidth: 300, minHeight: 200 },
 	imgfile: { minWidth: 300, minHeight: 250 },
+};
+
+const applyWindowStyle = (el: HTMLElement, pos: { x: number; y: number }, sz: { width: number; height: number }) => {
+	el.style.left = `${pos.x}px`;
+	el.style.top = `${pos.y}px`;
+	el.style.width = `${sz.width}px`;
+	el.style.height = `${sz.height}px`;
 };
 
 const getWindowConstraints = (key: string) => {
@@ -59,11 +65,14 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 			resizeStart: null as ResizeState | null,
 			dragStartMouse: { x: 0, y: 0 },
 			dragStartPos: { x: 0, y: 0 },
-			pendingUpdate: false,
-			rafId: 0 as number,
 		});
 
+		const isMaximizedRef = useRef(isMaximized);
+		isMaximizedRef.current = isMaximized;
+
 		const rafRef = useRef<number | null>(null);
+		const rafPendingRef = useRef(false);
+		const latestDeltaRef = useRef({ x: 0, y: 0 });
 		const lastPosRef = useRef({ x: 0, y: 0, w: 0, h: 0 });
 
 		useEffect(() => {
@@ -79,17 +88,55 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 			};
 		}, []);
 
+		useLayoutEffect(() => {
+			const el = ref.current;
+			if (!el || !isOpen) return;
+			const beforeTop = el.style.top;
+			if (!stateRef.current.isResizing) {
+				const p = position ?? { x: 0, y: 0 };
+				const s = size ?? { width: 400, height: 300 };
+				console.log('LAYOUT_BEFORE', { windowKey, storePos: p, styleTop: beforeTop });
+				applyWindowStyle(el, p, s);
+				console.log('LAYOUT_AFTER', { windowKey, styleTop: el.style.top });
+				lastPosRef.current = { x: p.x, y: p.y, w: s.width, h: s.height };
+			}
+		}, [position, size, isOpen]);
+
 		useGSAP(() => {
 			const el = ref.current;
 			if (!el || !isOpen || !isDesktop) return;
 
+			gsap.set(el, { x: 0, y: 0, clearProps: 'transform' });
+
+			console.log("WINDOW_OPEN", {
+				windowKey,
+				storePosition: position,
+				styleTop: el.style.top,
+				styleLeft: el.style.left,
+				computedTop: getComputedStyle(el).top,
+				computedTransform: getComputedStyle(el).transform,
+				boundingRect: el.getBoundingClientRect(),
+			});
+			let node = el.parentElement;
+			while (node) {
+				const cs = getComputedStyle(node);
+				console.log('PARENT', {
+					element: node.className || node.id || node.tagName,
+					position: cs.position,
+					transform: cs.transform,
+					overflow: cs.overflow,
+					top: cs.top,
+					left: cs.left,
+				});
+				node = node.parentElement;
+			}
+
 			gsap.fromTo(
 				el,
-				{ scale: 0.8, opacity: 0, y: 40 },
+				{ opacity: 0, scale: 0.92 },
 				{
-					scale: 1,
 					opacity: 1,
-					y: 0,
+					scale: 1,
 					duration: 0.4,
 					ease: 'power3.out',
 				},
@@ -109,11 +156,11 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 				onPress: () => {
 					focusWindow(windowKey);
 				},
-				onDrag: function() {
+				onDrag: function(this: any) {
 					const y = this.y;
-					const minY = 0;
-					if (y < minY) {
-						this.y = minY;
+					console.log('DRAG', { windowKey, clientY: y, cssTop: el.style.top });
+					if (y < DESKTOP_NAVBAR_HEIGHT) {
+						this.y = DESKTOP_NAVBAR_HEIGHT;
 						this.update();
 					}
 				},
@@ -125,22 +172,6 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 				instance.kill();
 			};
 		}, [focusWindow, isDesktop, isOpen, windowKey]);
-
-		const scheduleFrame = useCallback((callback: () => void) => {
-			const state = stateRef.current;
-			if (state.pendingUpdate) return;
-
-			state.pendingUpdate = true;
-
-			if (rafRef.current) {
-				cancelAnimationFrame(rafRef.current);
-			}
-
-			rafRef.current = requestAnimationFrame(() => {
-				state.pendingUpdate = false;
-				callback();
-			});
-		}, []);
 
 		const handleResizeStart = useCallback(
 			(direction: ResizeDirection) => (e: React.PointerEvent) => {
@@ -156,8 +187,8 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 				state.isResizing = true;
 				state.resizeDirection = direction;
 				state.resizeStart = {
-					pos: { x: position?.x ?? 0, y: position?.y ?? 0 },
-					dim: { width: size?.width ?? 400, height: size?.height ?? 300 },
+					pos: { x: rect.left, y: rect.top },
+					dim: { width: rect.width, height: rect.height },
 					mouse: { x: e.clientX, y: e.clientY },
 				};
 
@@ -165,7 +196,7 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 				win.style.cursor = getCursorForDirection(direction);
 				win.setPointerCapture(e.pointerId);
 			},
-			[position, size, focusWindow, windowKey],
+			[focusWindow, windowKey],
 		);
 
 		const handlePointerMove = useCallback(
@@ -175,31 +206,37 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 
 				const state = stateRef.current;
 
-				if (isMaximized) return;
+				if (isMaximizedRef.current) return;
 
 				if (state.isResizing && state.resizeDirection && state.resizeStart) {
 					const deltaX = e.clientX - state.resizeStart.mouse.x;
 					const deltaY = e.clientY - state.resizeStart.mouse.y;
 					const constraints = getWindowConstraints(windowKey);
 
-					scheduleFrame(() => {
-						const result = calculateResize(
-							state.resizeDirection!,
-							state.resizeStart!,
-							deltaX,
-							deltaY,
-							constraints,
-						);
-						applyResizeToElement(win, result);
-						lastPosRef.current = { x: result.pos.x, y: result.pos.y, w: result.dim.width, h: result.dim.height };
-					});
+					// Store latest delta — always use most recent input on RAF tick
+					latestDeltaRef.current = { x: deltaX, y: deltaY };
+					if (!rafPendingRef.current) {
+						rafPendingRef.current = true;
+						rafRef.current = requestAnimationFrame(() => {
+							rafPendingRef.current = false;
+							const result = calculateResize(
+								state.resizeDirection!,
+								state.resizeStart!,
+								latestDeltaRef.current.x,
+								latestDeltaRef.current.y,
+								constraints,
+							);
+							applyResizeToElement(win, result);
+							lastPosRef.current = { x: result.pos.x, y: result.pos.y, w: result.dim.width, h: result.dim.height };
+						});
+					}
 				} else {
 					const rect = win.getBoundingClientRect();
 					const direction = getDirectionFromPosition(e.clientX, e.clientY, rect);
 					win.style.cursor = direction ? getCursorForDirection(direction) : 'default';
 				}
 			},
-			[windowKey, scheduleFrame],
+			[windowKey],
 		);
 
 		const handlePointerUp = useCallback(
@@ -239,6 +276,7 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 					cancelAnimationFrame(rafRef.current);
 					rafRef.current = null;
 				}
+				rafPendingRef.current = false;
 
 				win.releasePointerCapture(e.pointerId);
 			},
@@ -278,10 +316,6 @@ const WindowWrapper = <Props extends ReactJSX.IntrinsicAttributes>(
 				style={{
 					zIndex,
 					display: isOpen ? undefined : 'none',
-					left: position?.x ?? undefined,
-					top: position?.y ?? undefined,
-					width: size?.width ?? undefined,
-					height: size?.height ?? undefined,
 				}}
 				className={`desktop-window absolute ${isMaximized ? 'maximized' : ''}`}
 			>

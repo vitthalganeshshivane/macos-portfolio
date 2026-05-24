@@ -16,10 +16,10 @@ export interface ResizeConstraints {
 }
 
 export interface ResizeDirection {
-  N: boolean;
-  S: boolean;
-  E: boolean;
-  W: boolean;
+  N?: boolean;
+  S?: boolean;
+  E?: boolean;
+  W?: boolean;
 }
 
 export interface ResizeState {
@@ -36,6 +36,8 @@ export interface ResizeResult {
 
 const EDGE_SIZE = 14;
 const CORNER_SIZE = 22;
+
+export const DESKTOP_NAVBAR_HEIGHT = 40;
 
 export function getDirectionFromPosition(
   clientX: number,
@@ -120,6 +122,12 @@ export function calculateResize(
   if (direction.W) newX = startX + (startW - newW);
   if (direction.N) newY = startY + (startH - newH);
 
+  if (direction.N && newY < DESKTOP_NAVBAR_HEIGHT) {
+    const bottomEdge = startY + startH;
+    newY = DESKTOP_NAVBAR_HEIGHT;
+    newH = Math.max(constraints.minHeight, bottomEdge - DESKTOP_NAVBAR_HEIGHT);
+  }
+
   const isAtBoundary =
     newW === constraints.minWidth ||
     newW === constraints.maxWidth ||
@@ -143,7 +151,7 @@ export function calculateDrag(
   const deltaY = currentMouse.y - startMouse.y;
 
   const newX = Math.max(0, Math.min(bounds.maxX, startPos.x + deltaX));
-  const newY = Math.max(0, Math.min(bounds.maxY, startPos.y + deltaY));
+  const newY = Math.max(DESKTOP_NAVBAR_HEIGHT, Math.min(bounds.maxY, startPos.y + deltaY));
 
   return { x: Math.round(newX), y: Math.round(newY) };
 }

@@ -1,3 +1,4 @@
+import { DESKTOP_NAVBAR_HEIGHT } from '#lib/resize-engine';
 import { INITIAL_Z_INDEX, WINDOW_CONFIG } from '#constants';
 import type { WindowData, WindowKey } from '#types';
 import { create } from 'zustand';
@@ -38,6 +39,10 @@ export interface WindowState {
 	toggleMaximize: (windowKey: WindowKey) => void;
 }
 
+const WINDOW_Y_MIN = DESKTOP_NAVBAR_HEIGHT + 16;
+const clampY = (y: number): number => Math.max(WINDOW_Y_MIN, y);
+const clampPosition = (p: WindowPosition): WindowPosition => ({ x: p.x, y: clampY(p.y) });
+
 const getDefaultPosition = (windowKey: WindowKey): WindowPosition => {
 	const positions: Record<string, WindowPosition> = {
 		finder: { x: 100, y: 80 },
@@ -50,37 +55,44 @@ const getDefaultPosition = (windowKey: WindowKey): WindowPosition => {
 		txtfile: { x: 200, y: 100 },
 		imgfile: { x: 220, y: 120 },
 	};
-	return positions[windowKey] ?? { x: 100, y: 100 };
+	const pos = positions[windowKey] ?? { x: 100, y: 100 };
+	const result: WindowPosition = { x: pos.x, y: clampY(pos.y) };
+	console.log('getDefaultPosition', { windowKey, raw: pos, clamped: result, WINDOW_Y_MIN });
+	return result;
 };
 
 const getDefaultSize = (windowKey: WindowKey): WindowSize => {
 	const sizes: Record<string, WindowSize> = {
-		finder: { width: 500, height: 380 },
-		safari: { width: 700, height: 500 },
-		photos: { width: 600, height: 450 },
-		contact: { width: 380, height: 450 },
-		resume: { width: 500, height: 600 },
-		terminal: { width: 450, height: 400 },
-		veronica: { width: 500, height: 500 },
-		txtfile: { width: 400, height: 300 },
-		imgfile: { width: 500, height: 400 },
+		finder: { width: 900, height: 650 },
+		safari: { width: 1000, height: 700 },
+		photos: { width: 850, height: 600 },
+		contact: { width: 500, height: 600 },
+		resume: { width: 750, height: 800 },
+		terminal: { width: 700, height: 550 },
+		veronica: { width: 750, height: 650 },
+		txtfile: { width: 600, height: 450 },
+		imgfile: { width: 700, height: 550 },
 	};
-	return sizes[windowKey] ?? { width: 400, height: 300 };
+	return sizes[windowKey] ?? { width: 600, height: 450 };
 };
 
-const createWindowMeta = (windowKey: WindowKey): WindowMeta => ({
-	isOpen: false,
-	zIndex: INITIAL_Z_INDEX,
-	data: null,
-	position: getDefaultPosition(windowKey),
-	size: getDefaultSize(windowKey),
-	isMaximized: false,
-	prevPosition: null,
-	prevSize: null,
-});
+const createWindowMeta = (windowKey: WindowKey): WindowMeta => {
+	const meta: WindowMeta = {
+		isOpen: false,
+		zIndex: INITIAL_Z_INDEX,
+		data: null,
+		position: getDefaultPosition(windowKey),
+		size: getDefaultSize(windowKey),
+		isMaximized: false,
+		prevPosition: null,
+		prevSize: null,
+	};
+	console.log('createWindowMeta', { windowKey, position: meta.position });
+	return meta;
+};
 
 const useWindowStore = create<WindowState>()(
-	immer((set, get) => ({
+	immer((set) => ({
 		windows: Object.keys(WINDOW_CONFIG).reduce((acc, key) => {
 			acc[key as WindowKey] = createWindowMeta(key as WindowKey);
 			return acc;
@@ -90,8 +102,10 @@ const useWindowStore = create<WindowState>()(
 		openWindow: (windowKey, data = null) => {
 			set((state: WindowState) => {
 				const win = state.windows[windowKey];
+				const posBefore = { ...win.position };
 				win.isOpen = true;
 				win.zIndex = state.nextZIndex++;
+
 				win.data = data ?? win.data;
 
 				if (!win.position) {
@@ -100,6 +114,7 @@ const useWindowStore = create<WindowState>()(
 				if (!win.size) {
 					win.size = getDefaultSize(windowKey);
 				}
+				console.log('openWindow', { windowKey, posBefore, posAfter: { ...win.position } });
 			});
 		},
 
@@ -147,17 +162,20 @@ const useWindowStore = create<WindowState>()(
 				if (!win.isOpen) return;
 
 				if (win.isMaximized) {
+					const prevPos = { ...win.prevPosition! };
 					win.isMaximized = false;
-					win.position = win.prevPosition ?? getDefaultPosition(windowKey);
+					win.position = win.prevPosition ? clampPosition(win.prevPosition) : getDefaultPosition(windowKey);
 					win.size = win.prevSize ?? getDefaultSize(windowKey);
 					win.prevPosition = null;
 					win.prevSize = null;
+					console.log('toggleMaximize (restore)', { windowKey, prevPos, restored: { ...win.position } });
 				} else {
-					win.prevPosition = win.position ? { ...win.position } : getDefaultPosition(windowKey);
+					win.prevPosition = win.position ? { ...clampPosition(win.position) } : getDefaultPosition(windowKey);
 					win.prevSize = win.size ? { ...win.size } : getDefaultSize(windowKey);
 					win.isMaximized = true;
-					win.position = { x: 0, y: 0 };
-					win.size = { width: window.innerWidth, height: window.innerHeight - 60 };
+					win.position = { x: 0, y: DESKTOP_NAVBAR_HEIGHT };
+					win.size = { width: window.innerWidth, height: window.innerHeight - DESKTOP_NAVBAR_HEIGHT };
+					console.log('toggleMaximize (max)', { windowKey, prevSaved: { ...win.prevPosition }, maximized: { ...win.position } });
 				}
 			});
 		},
